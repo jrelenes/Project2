@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <title>Homework #2: D3 Lollipop</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+        <script src="js/main.js"></script>
+        <link rel="stylesheet" href="styles.css">
+        <style>
+            select {
+                background-color: white;
+            }
+            
+        </style>
+        <script src='https://d3js.org/d3.v5.min.js'></script>
+
+
+    </head>
+    <body>
+      
+        <div class="container">
+            <h1 class="text-center">Homework #2: D3 Lollipop</h1>
+            <h3 class="text-center">Female vs Male employment rate in various countries</h3>
+            <div class="row">
+                <div class="col-1">Country: </div>
+                <div class="col-3">
+                    <!-- add your select here-->
+                    
+                
+                <select id="selectButton" style = "width:230px;"></select>
+                
+                    
+                </div>
+            </div>
+            <div id="my_dataviz">
+                <!-- create svg here -->
+                
+                <script>
+
+              
+
+                var margin = {top: 20, right: 20, bottom: 50, left: 70},
+                        width = 960 - margin.left - margin.right,
+                        height = 500 - margin.top - margin.bottom;
+                    
+                    var x0 = d3.scaleBand()
+                        .rangeRound([0, width])
+                        .paddingOuter(0.5);
+                    
+                    var x1 = d3.scaleBand();
+
+                    var xRange = d3.scaleTime()
+                            .range([0,width]);
+
+                    
+                    var y = d3.scaleLinear()
+                        .range([height, 0]);
+                    
+                    var xAxis = d3.axisBottom()
+                        .scale(x0)
+                        .tickSize(0);
+
+                    
+                    
+                    var yAxis = d3.axisLeft()
+                        .scale(y);
+                        
+                    
+                    var color = d3.scaleOrdinal()
+                        .range(['#048b8b','#ff1393']);
+                    
+                    var svg = d3.select('#my_dataviz')
+                        .append("svg")
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom)
+                      .append("g")
+                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                    
+                    
+                        
+                        d3.csv("data/males_data.csv").then(function(data1) {
+                                        d3.csv("data/females_data.csv").then(function(data2) {
+                    
+                                        let data = [];
+                                        let dataAlbania = [];
+                                        let dataAlgeria = [];
+                                        let dataAngola = [];
+                                        let dataArgentina = [];
+
+                                
+                    
+                    
+                    
+                                        for (var i = 0; i < data1.length; i++)
+                                        {
+                    
+                                            data.push({"Year": data1[i].Year, "Clusters": [{ "EmploymentRate": data1[i].Afghanistan, "tag": "Male Employment Rate" },{"EmploymentRate": data2[i].Afghanistan, "tag":"Female Employment Rate"}]});
+                                            dataAlbania.push({"Year": data1[i].Year, "Clusters": [{ "EmploymentRate": data1[i].Albania, "tag": "Male Employment Rate" },{"EmploymentRate": data2[i].Albania, "tag":"Female Employment Rate"}]});
+                                            dataAlgeria.push({"Year": data1[i].Year, "Clusters": [{ "EmploymentRate": data1[i].Algeria, "tag": "Male Employment Rate" },{"EmploymentRate": data2[i].Algeria, "tag":"Female Employment Rate"}]});
+                                            dataAngola.push({"Year": data1[i].Year, "Clusters": [{ "EmploymentRate": data1[i].Angola, "tag": "Male Employment Rate" },{"EmploymentRate": data2[i].Angola, "tag":"Female Employment Rate"}]});
+                                            dataArgentina.push({"Year": data1[i].Year, "Clusters": [{ "EmploymentRate": data1[i].Argentina, "tag": "Male Employment Rate" },{"EmploymentRate": data2[i].Argentina, "tag":"Female Employment Rate"}]});
+
+                                           
+                                        }
+
+                   
+                    
+                      var YearNames = data.map(function(d) { return d.Year; });
+                      var tagNames = data[0].Clusters.map(function(d) { return d.tag; });
+
+                      //select start here
+                      var allGroup = ["Afghanistan", "Albania", "Algeria","Angola","Argentina"]
+                      var dropdownButton = d3.select("#selectButton")
+
+                      // add the options to the button select button my button
+                      dropdownButton
+                      .selectAll('myOptions')
+                      .data(allGroup)
+                      .enter()
+                      .append('option')
+                      .text(function (d) { return d; }) // text showed in the menu
+                      .attr("CountryName", function (d) { return d; }) // corresponding value returned by the button
+
+                    
+                      x0.domain(YearNames);
+                      xRange.domain(["1990","2023"]);
+                      x1.domain(tagNames).rangeRound([0, x0.bandwidth()]);
+                      y.domain([0, d3.max(data, function(Year) { return d3.max(Year.Clusters, function(d) { return d.EmploymentRate; }); })]);
+                    
+                      svg.append("g")
+                          .attr("transform", "translate(0," + height + ")")
+                          .call(d3.axisBottom(xRange)
+                          .tickFormat(d3.format("d"))
+                          .ticks(5)
+                          );
+
+                          svg.append("text")             
+                            .attr("transform",
+                                    "translate(" + (width/2) + " ," + 
+                                                (height + margin.top + 20) + ")")
+                            .style("text-anchor", "middle")
+                            .style("font", "14px times")
+                            .text("Year");
+                    
+                      svg.append("g")
+                          .call(yAxis
+                          );
+
+                          svg.append("text")
+                            .attr("transform", "rotate(-90)")
+                            .attr("y", 5 - margin.left)
+                            .attr("x",0 - (height / 2))
+                            .attr("dy", "1em")
+                            .style("text-anchor", "middle")
+                            .style("font", "14px times")
+                            .text("Employment Rate"); 
+                    
+                          
+                          
+                    
+                    
+                      svg.select('.y').style('opacity','1');
+                    
+                      var slice = svg.selectAll("graph")
+                          .data(data)
+                          .enter().append("g")
+                          .attr("transform",function(d) { return "translate(" + x0(d.Year) + ",0)"; });
+                    
+                          
+                      slice.selectAll("rect")
+                          .data(function(d) { return d.Clusters; })
+                      .enter().append("rect")
+                          .attr("width",1)
+                          .attr("x", function(d) { 
+                            //console.log(x1(d.tag));  
+                            return x1(d.tag); })
+                          .style("fill", function(d) { 
+                           // console.log(color(d.tag)); // colors
+                            return color(d.tag) })
+                          .attr("y", function(d) { 
+                            console.log(y(0));  
+                            return y(0); })
+                          .attr("height", function(d) { 
+                              console.log(height - y(0));
+                              return height - y(0); });
+                          
+                    
+                      slice.selectAll("rect")
+                          .attr("y", function(d) { 
+                            //console.log(y(d.EmploymentRate));  
+                            return y(d.EmploymentRate); })
+                          .attr("height", function(d) { return height - y(d.EmploymentRate); });
+
+                       //here
+                       var slice = svg.selectAll("circle")
+                          .data(data)
+                          .enter().append("g")
+                          .attr("transform",function(d) { return "translate(" + x0(d.Year) + ",0)"; });
+                    
+                          
+                      slice.selectAll("circle")
+                          .data(function(d) { return d.Clusters; })
+                      .enter().append("circle")
+                          .attr("x", function(d) { 
+                            //console.log(x1(d.tag));  
+                            return x1(d.tag); })
+                          .attr("y", function(d) { 
+                            return y(0); })
+                          .attr("height", function(d) {
+                              //console.log(height - y(0)); 
+                              return height - y(0); });
+                          
+                    
+                      slice.selectAll("circle")
+                             .attr("cx", function(d) {return x1(d.tag); })
+                             .attr("cy", function(d) {return y(d.EmploymentRate); })
+                             .style("fill", function(d) { 
+                           // console.log(color(d.tag)); // colors
+                            return color(d.tag) })
+                             .attr("r", 5);
+                            
+                                    
+                                    
+                    
+                      //Legend
+                      var legend = svg.selectAll(".legend")
+                          .data(data[0].Clusters.map(function(d) { return d.tag; }).reverse())
+                      .enter().append("g")
+                          .attr("class", "legend")
+                          .attr("transform", function(d,i) { return "translate(0," + i * 20 + ")"; })
+                          .style("opacity","0")
+                    
+                      legend.append("rect")
+                          .attr("x", width - 175)
+                          .attr("width", 18)
+                          .attr("height", 18)
+                          .style("fill", function(d) { return color(d); });
+                    
+                          legend.append("text")
+                          .attr("x", width - 24)
+                          .attr("y", 9)
+                          .attr("dy", ".35em")
+                          .attr("dx", "-9em")
+                          .style("font", "14px bold arial")
+                          .style("text-anchor", "start")
+                          .text(function(d) {return d; });
+                    
+                      legend.style("opacity","1");
+                    
+                  
+                   
+                  
+                    // A function that update the chart
+                    function update(selectedGroup) {
+                      // Create new data with the selection?
+                      console.log(selectedGroup);
+
+                      var dataFilter = "";
+
+                      if (selectedGroup == "Afghanistan") {
+                            
+                            dataFilter = data;
+
+                    } else if (selectedGroup == "Albania") {
+
+                            console.log("here");
+
+                            dataFilter = dataAlbania;
+
+                    } else if (selectedGroup == "Algeria") {
+
+
+                            dataFilter = dataAlgeria;
+
+                    } else if (selectedGroup == "Angola") {
+
+                            dataFilter = dataAngola;
+
+                    } else if (selectedGroup == "Argentina") {
+
+                            dataFilter = dataArgentina;
+
+                    }
+                    
+                      console.log("testing");
+                      console.log(dataFilter[0].Year);
+                      
+                      
+                     
+                      var YearNames = dataFilter.map(function(d) { return d.Year; });
+                      var tagNames = dataFilter[0].Clusters.map(function(d) { return d.tag; });
+
+                      svg.selectAll("*").remove();
+
+                    
+                      x0.domain(YearNames);
+                      x1.domain(tagNames).rangeRound([0, x0.bandwidth()]);
+                      y.domain([0, d3.max(dataFilter, function(Year) { return d3.max(Year.Clusters, function(d) { return d.EmploymentRate; }); })]);
+                    
+
+                    
+                      svg.append("g")
+                          .attr("transform", "translate(0," + height + ")")
+                          .call(d3.axisBottom(xRange)
+                          .tickFormat(d3.format("d"))
+                          .ticks(5)
+                          );
+
+                          svg.append("text")             
+                            .attr("transform",
+                                    "translate(" + (width/2) + " ," + 
+                                                (height + margin.top + 20) + ")")
+                            .style("text-anchor", "middle")
+                            .style("font", "14px times")
+                            .text("Year");
+                    
+                      svg.append("g")
+                          .call(yAxis
+                          );
+
+                          svg.append("text")
+                            .attr("transform", "rotate(-90)")
+                            .attr("y", 5 - margin.left)
+                            .attr("x",0 - (height / 2))
+                            .attr("dy", "1em")
+                            .style("text-anchor", "middle")
+                            .style("font", "14px times")
+                            .text("Employment Rate"); 
+                    
+                    
+                    
+                      svg.select('.y').style('opacity','1');
+
+                      
+                      //clears the graph
+                      //must fix for axis
+                      svg.selectAll(".legend").remove();
+                      svg.selectAll("rect").remove();
+
+                      svg.selectAll("circle").remove();
+
+
+
+
+                      var slice = svg.selectAll(".slice")
+                          .data(dataFilter)
+                          .enter().append("g")
+                          .attr("class", "g")
+                          .attr("transform",function(d) { return "translate(" + x0(d.Year) + ",0)"; });
+                    
+                      slice.selectAll("rect")
+                          .data(function(d) { return d.Clusters; })
+                      .enter().append("rect")
+                          .attr("width",1)
+                          .attr("x", function(d) { 
+                            return x1(d.tag); })
+                          .style("fill", function(d) { return color(d.tag) })
+                          .attr("y", function(d) { return y(0); })
+                          .attr("height", function(d) { return height - y(0); });
+                    
+                      slice.selectAll("rect")
+                          .attr("y", function(d) { return y(d.EmploymentRate); })
+                          .attr("height", function(d) { return height - y(d.EmploymentRate); });
+
+                     //here
+                     var slice = svg.selectAll("circle")
+                          .data(dataFilter)
+                          .enter().append("g")
+                          .attr("transform",function(d) { return "translate(" + x0(d.Year) + ",0)"; });
+                    
+                          
+                      slice.selectAll("circle")
+                          .data(function(d) { return d.Clusters; })
+                      .enter().append("circle")
+                          .attr("x", function(d) { 
+                            //console.log(x1(d.tag));  
+                            return x1(d.tag); })
+                          .attr("y", function(d) { 
+                            return y(0); })
+                          .attr("height", function(d) {
+                              //console.log(height - y(0)); 
+                              return height - y(0); });
+                          
+                    
+                      slice.selectAll("circle")
+                             .attr("cx", function(d) {return x1(d.tag); })
+                             .attr("cy", function(d) {return y(d.EmploymentRate); })
+                             .style("fill", function(d) { 
+                           // console.log(color(d.tag)); // colors
+                            return color(d.tag) })
+                             .attr("r", 5);
+
+                       //Legend
+                       var legend = svg.selectAll(".legend")
+                          .data(dataFilter[0].Clusters.map(function(d) { return d.tag; }).reverse())
+                      .enter().append("g")
+                          .attr("class", "legend")
+                          .attr("transform", function(d,i) { return "translate(0," + i * 20 + ")"; })
+                          .style("opacity","0");
+                    
+                      legend.append("rect")
+                          .attr("x", width - 175)
+                          .attr("width", 18)
+                          .attr("height", 18)
+                          .style("fill", function(d) { return color(d); });
+                    
+                      legend.append("text")
+                          .attr("x", width - 24)
+                          .attr("y", 9)
+                          .attr("dy", ".35em")
+                          .attr("dx", "-9em")
+                          .style("font", "14px bold arial")
+                          .style("text-anchor", "start")
+                          .text(function(d) {return d; });
+                    
+                      legend.style("opacity","1");
+                    
+
+                          
+                      
+    
+                          
+                          
+                    }
+                    // When the button is changed, run the updateChart function
+                    d3.select("#selectButton").on("change", function(d) {
+                        // recover the option that has been chosen
+                        var selectedOption = d3.select(this).property("value")
+                        // run the updateChart function with this selected option
+                        update(selectedOption)
+                    })
+
+                
+
+               
+                    
+                });
+            });
+                </script>
+
+                
+</body>
+                  
+            </div>
+        </div>
+        
+    </body>
+</html>
